@@ -38,7 +38,7 @@
 	         ================================= -->
 		<target name="resolve" description="--> retreive dependencies with ivy" depends="bootstrap">
 			<ivy:resolve />
-			<ivy:retrieve sync="true"/>
+<!-- 			<ivy:retrieve sync="true"/> -->
 		</target>
 
 		<!-- Compile the java code from ${src} into ${bin} -->
