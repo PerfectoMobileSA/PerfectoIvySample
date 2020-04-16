@@ -1,0 +1,66 @@
+<project name="PerfectoIvySample" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<property environment="env"/>
+	<!-- some variables used -->
+	<property name="basedir" value="." />
+	<property name="lib.dir" value="lib" />
+	<property name="build.dir" value="build" />
+	<property name="bin.dir" value="bin" />
+	<property name="src.dir" value="src" />
+	<property file="ivysettings.properties" />
+	<property name="report-dir" value="${basedir}/Test-Report" />
+	<property name="testng-report-dir" value="${report-dir}/TestNGreport" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+	<property name="testNGXmlFile" value="testng_Selenium.xml"></property>
+
+	<!-- paths used for compilation and run  -->
+	<path id="build.classPath">
+		<pathelement location="${bin.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<path id="run.path.id">
+		<path refid="build.classPath" />
+		<path location="${build.dir}" />
+	</path>
+
+	<target name="clean">
+	        <delete dir="{bin.dir}"/>
+	    </target>
+	<target name="bootstrap" description="Used to install the ivy task jar" depends="clean">
+<!--	    <mkdir dir="${ant.home}/lib"/>
+-->	    <get dest="${ant.home}/lib/ivy.jar" src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/2.5.0/ivy-2.5.0.jar"/>
+	</target>
+	<!-- =================================
+	          target: resolve
+	         ================================= -->
+		<target name="resolve" description="--> retreive dependencies with ivy" depends="bootstrap">
+			<ivy:resolve />
+			<ivy:retrieve sync="true"/>
+		</target>
+
+		<!-- Compile the java code from ${src} into ${bin} -->
+		<target name="compile" depends="resolve">
+			<javac srcdir="${src.dir}" classpathref="build.classPath" includeAntRuntime="No" destdir="${bin.dir}" />
+			<echo> /* Compiled Directory Classes */ </echo>
+		</target>
+		
+		<target name="testng-execution" depends="compile">
+			<taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="build.classPath"/>
+			<mkdir dir="${testng-report-dir}" />
+			<testng outputdir="${testng-report-dir}" classpathref="build.classPath" useDefaultListeners="true">
+				<jvmarg value="-DcloudName=${cloudName}"/>
+				<jvmarg value="-DsecurityToken=${securityToken}"/>
+				<jvmarg value="-Dreportium-job-name=${reportium-job-name}"/>
+				<jvmarg value="-Dreportium-job-number=${reportium-job-number}"/>
+				<xmlfileset dir="${basedir}" includes="${testNGXmlFile}" />
+			</testng>
+			<!-- Runs the file and generates Reportng report for TestNG-->
+						
+		</target>
+	
+	
+
+</project>
